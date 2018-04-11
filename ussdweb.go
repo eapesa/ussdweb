@@ -29,7 +29,7 @@ func ussdCodeHandler(res http.ResponseWriter, req *http.Request) {
 
   process_payload(sender, ds)
   res.Header().Set("Content-Type", "application/xml")
-  res.Write(prompt_reply());
+  res.Write(prompt_reply(GETBALANCE + "P10000."));
 }
 
 func process_payload(sender, ds string) {
@@ -57,6 +57,5 @@ func parse(dialstring string) []string {
     fmt.Printf("ERROR: Encountered error decoding query string\n")
   }
 
-  fmt.Printf("DECODED DIALSTRING: %v\n", dsdecoded)
   return strings.Split(dsdecoded, "*#")
 }

@@ -4,28 +4,38 @@ import (
   "encoding/xml"
 )
 
+const (
+  HELLOWORLD = "Hello World!",
+  GETBALANCE = "Your current balance is "
+)
+
 type VxmlPrompt struct {
   XMLName   xml.Name    `xml:"vxml"`
-  Form      Form        `xml:"form"`
+  Form      *Form       `xml:"form"`
 }
 
 type Form struct {
   Id        string    `xml:"id,attr"`
   Name      string    `xml:"name,attr"`
-  Field     Field     `xml:"field"`
-  Filled    Filled    `xml:"filled"`
-  Catch     Catch     `xml:"catch"`
-  Property  Property  `xml:"property"`
+  Block     string    `xml:"block,omitempty"`
+  Field     *Field    `xml:"field,omitempty"`
+  Filled    *Filled   `xml:"filled,omitempty"`
+  Catch     *Catch    `xml:"catch,omitempty"`
+  Property  *Property `xml:"property,omitempty"`
+}
+
+type Value struct {
+  Expr  string  `xml:"expr,attr,omitempty"`
 }
 
 type Field struct {
   FieldName  string  `xml:"name,attr"`
-  Prompt     string  `xml:"prompt>field"`
+  Prompt     string  `xml:"prompt"`
 }
 
 type Filled struct {
-  Assign    Assign  `xml:"assign"`
-  Goto      Goto    `xml:"goto"`
+  Assign    *Assign `xml:"assign"`
+  Goto      *Goto   `xml:"goto"`
 }
 
 type Assign struct {
@@ -39,8 +49,8 @@ type Goto struct {
 
 type Catch struct {
   Event   string  `xml:"event,attr"`
-  Prompt  string  `xml:"prompt>catch"`
-  Goto    Goto    `xml:"goto"`
+  Prompt  string  `xml:"prompt"`
+  Goto    *Goto   `xml:"goto"`
 }
 
 type Property struct {
@@ -48,32 +58,32 @@ type Property struct {
   PropertyValue string  `xml:"value,attr"`
 }
 
-func prompt_reply() []byte {
+func prompt_reply(textPrompt string) []byte {
   vxml := &VxmlPrompt{
-    Form: Form{
+    Form: &Form{
       Id: "Output",
       Name: "Output",
-      Field: Field{
+      Field: &Field{
         FieldName: "oc_Output",
-        Prompt: "Your transaction is being processed.",
+        Prompt: textPrompt,
       },
-      Filled: Filled{
-        Assign: Assign{
+      Filled: &Filled{
+        Assign: &Assign{
           AssignName: "",
-          Expr: "",
+          Expr: "oc_Output",
         },
-        Goto: Goto{
+        Goto: &Goto{
           Next: "",
         },
       },
-      Catch: Catch{
+      Catch: &Catch{
         Event: "nomatch",
-        Prompt: "Invalid choice. Try again.",
-        Goto: Goto{
+        Prompt: "Invalid input",
+        Goto: &Goto{
           Next: "#Output",
         },
       },
-      Property: Property{
+      Property: &Property{
         PropertyName: "oc_bIsFinal",
         PropertyValue: "1",
       },
