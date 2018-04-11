@@ -2,6 +2,8 @@ package main
 
 import(
   "net/http"
+  "net/url"
+  "strings"
   "fmt"
 )
 
@@ -11,9 +13,8 @@ func main() {
 
 func initializeServer() {
   port := ":8000"
-  // ussdcode := 118
   fmt.Printf("Initializing server at port%s\n", port)
-  http.HandleFunc("/118/handler", ussdCodeHandler)
+  http.HandleFunc("/", ussdCodeHandler)
   http.ListenAndServe(port, nil)
 }
 
@@ -23,9 +24,39 @@ func ussdCodeHandler(res http.ResponseWriter, req *http.Request) {
     return
   }
 
-  sender     := req.URL.Query().Get("sender")
-  dialstring := req.URL.Query().Get("dialstring")
-  fmt.Printf("SENDER=%v || DIALSTRING=%v\n", sender, dialstring)
+  sender := req.URL.Query().Get("sender")
+  ds     := req.URL.Query().Get("dialstring")
 
-  res.Write(OK);
+  process_payload(sender, ds)
+  res.Header().Set("Content-Type", "application/xml")
+  res.Write(prompt_reply());
+}
+
+func process_payload(sender, ds string) {
+  if sender == "" {
+    fmt.Printf("ERROR: Invalid inputs (`sender`)\n")
+    return
+  }
+
+  if ds  == "" {
+    fmt.Printf("ERROR: Invalid inputs (`dialstring`)\n")
+    return
+  }
+
+  dsdecoded, err := url.QueryUnescape(ds)
+  if err != nil {
+    fmt.Printf("ERROR: Dialstring can't be decoded\n")
+  }
+
+  fmt.Printf("TODO: Process dialstring %s\n", dsdecoded)
+}
+
+func parse(dialstring string) []string {
+  dsdecoded, err := url.QueryUnescape(dialstring)
+  if err != nil {
+    fmt.Printf("ERROR: Encountered error decoding query string\n")
+  }
+
+  fmt.Printf("DECODED DIALSTRING: %v\n", dsdecoded)
+  return strings.Split(dsdecoded, "*#")
 }
