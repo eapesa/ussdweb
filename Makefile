@@ -3,7 +3,7 @@ GO=go
 PWD=$(CURDIR)
 MKDIR_P=mkdir -p
 BUILD_DIR=$(PWD)/builds
-APPNAME=$$(basename $$(PWD))
+APPNAME=ussdweb
 
 .PHONY: install clean run
 
