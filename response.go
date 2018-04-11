@@ -5,7 +5,7 @@ import (
 )
 
 const (
-  HELLOWORLD = "Hello World!",
+  HELLOWORLD = "Hello World!"
   GETBALANCE = "Your current balance is "
 )
 
