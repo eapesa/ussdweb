@@ -6,7 +6,7 @@ telephones and mobile applications. It aims to see the capacity of [USSD](https:
 to host data exchange between mobile applications that only has GSM signal.
 
 USSD Web Server is the backend counterpart of the project and works in partner with
-[USSD POC (Android)](https://github.com/eapesa/ussdpoc-android) which connects to
+[USSD POC (Android)](https://github.com/eapesa/ussdmobile-android) which connects to
 the provisioned USSD code for this POC.
 
 
