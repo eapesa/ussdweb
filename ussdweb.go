@@ -34,10 +34,10 @@ func main() {
   }
   serverPubkey = string(keyByte)
 
+  initializeServer()
+
   defer db.PkInsertQuery.Close()
   defer db.DbObj.Close()
-
-  initializeServer()
 }
 
 func initializeServer() {

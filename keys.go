@@ -38,7 +38,7 @@ func createKeys() ([]byte, error) {
   errPub  := savePublicPem("priv/ussd_pub.pem", key.PublicKey)
 
   if errPriv != nil || errPub != nil {
-    return make([]byte, 0), errors.New("Error in key creation")
+    return make([]byte, 0), errors.New("Error in keys creation")
   }
 
   return ioutil.ReadFile("priv/ussd_pub.pem")
