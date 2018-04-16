@@ -3,8 +3,10 @@ package main
 import(
   "net/http"
   "net/url"
-  "strings"
+
   "encoding/json"
+
+  "strings"
   "fmt"
 )
 
@@ -16,16 +18,25 @@ type Pubkey struct {
 }
 
 var db *UssDB
+var serverPubkey string
 func main() {
   var err error
   db, err = initializeDb()
   if err != nil {
     fmt.Printf("ERROR in initializeDb: %v\n", err)
+    return
   }
 
-  defer db.DbObj.Close()
+  keyByte, err := loadKeys()
+  if err != nil {
+    fmt.Printf("Error in loadKeys: %v\n", err)
+    return
+  }
+  serverPubkey = string(keyByte)
+
   defer db.PkInsertQuery.Close()
-  
+  defer db.DbObj.Close()
+
   initializeServer()
 }
 
@@ -98,7 +109,7 @@ func pubkeyHandler(res http.ResponseWriter, req *http.Request) {
   insertPubkey(db.PkInsertQuery, pubkey.UserId, pubkey.Pubkey)
 
   output, err2 := json.Marshal(&Pubkey{
-    Pubkey: "some-pubkey",
+    Pubkey: serverPubkey,
     Code: "OK",
     Message: "Operation completed successfully",
   })
@@ -112,6 +123,18 @@ func pubkeyHandler(res http.ResponseWriter, req *http.Request) {
 }
 
 /*
+  Helper function for easier testing of maximum character count.
+ */
+func multiplyString(text string, count int) string {
+  textAll := ""
+  for i := 0; i < count; i++ {
+    textAll += text
+  }
+  return textAll
+}
+
+/*
   NOTES:
-  Use goroutine to start the server and create a channel for checking if there's a signal for exit
+  Use goroutine to start the server and create a channel for checking if there's
+  a signal for exit then safely shutdown the server
  */
