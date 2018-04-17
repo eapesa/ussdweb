@@ -58,7 +58,7 @@ type Property struct {
   PropertyValue string  `xml:"value,attr"`
 }
 
-func prompt_reply(textPrompt string) []byte {
+func sendInfomsg(textPrompt string) []byte {
   vxml := &VxmlPrompt{
     Form: &Form{
       Id: "Output",
