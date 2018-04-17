@@ -21,7 +21,7 @@ func ussdCodeHandler(res http.ResponseWriter, req *http.Request) {
 
   process_payload(sender, ds)
   res.Header().Set("Content-Type", "application/xml")
-  res.Write(prompt_reply(GETBALANCE + "P10000."));
+  res.Write(sendCustomMsg(multiplyString("+123456789", 15)));
 }
 
 func pubkeyHandler(res http.ResponseWriter, req *http.Request) {

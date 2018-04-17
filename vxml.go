@@ -11,17 +11,18 @@ const (
 
 type VxmlPrompt struct {
   XMLName   xml.Name    `xml:"vxml"`
-  Form      *Form       `xml:"form"`
+  Form      Forms       `xml:"form"`
 }
 
 type Form struct {
   Id        string    `xml:"id,attr"`
   Name      string    `xml:"name,attr"`
-  Block     string    `xml:"block,omitempty"`
+  // Block     string    `xml:"block,omitempty"`
   Field     *Field    `xml:"field,omitempty"`
   Filled    *Filled   `xml:"filled,omitempty"`
   Catch     *Catch    `xml:"catch,omitempty"`
   Property  *Property `xml:"property,omitempty"`
+  Block     Blocks    `xml:"block,omitempty"`
 }
 
 type Value struct {
@@ -58,38 +59,113 @@ type Property struct {
   PropertyValue string  `xml:"value,attr"`
 }
 
-func sendInfomsg(textPrompt string) []byte {
+type Block struct {
+  BlockName  string  `xml:"name,attr"`
+  Goto       *Goto   `xml:"goto"`
+}
+
+type Forms  []*Form
+type Blocks []*Block
+
+func sendInfoMsg(textPrompt string) []byte {
   vxml := &VxmlPrompt{
-    Form: &Form{
-      Id: "Output",
-      Name: "Output",
-      Field: &Field{
-        FieldName: "oc_Output",
-        Prompt: textPrompt,
-      },
-      Filled: &Filled{
-        Assign: &Assign{
-          AssignName: "",
-          Expr: "oc_Output",
+    Form: Forms{
+      &Form{
+        Id: "Output",
+        Name: "Output",
+        Field: &Field{
+          FieldName: "oc_Output",
+          Prompt: textPrompt,
         },
-        Goto: &Goto{
-          Next: "",
+        Filled: &Filled{
+          Assign: &Assign{
+            AssignName: "",
+            Expr: "oc_Output",
+          },
+          Goto: &Goto{
+            Next: "",
+          },
         },
-      },
-      Catch: &Catch{
-        Event: "nomatch",
-        Prompt: "Invalid input",
-        Goto: &Goto{
-          Next: "#Output",
+        Catch: &Catch{
+          Event: "nomatch",
+          Prompt: "Invalid input",
+          Goto: &Goto{
+            Next: "#Output",
+          },
         },
-      },
-      Property: &Property{
-        PropertyName: "oc_bIsFinal",
-        PropertyValue: "1",
+        Property: &Property{
+          PropertyName: "oc_bIsFinal",
+          PropertyValue: "1",
+        },
       },
     },
   }
+  return send(vxml)
+}
 
+func sendCustomMsg(textPrompt string) []byte {
+  vxml := &VxmlPrompt{
+    Form: Forms{
+      &Form{
+        Id: "form_custom_msg",
+        Name: "form_custom_msg",
+        Field: &Field{
+          FieldName: "field_custom_msg",
+          Prompt: textPrompt,
+        },
+        Filled: &Filled{
+          Assign: &Assign{
+            AssignName: "var_custom_msg",
+            Expr: "field_custom_msg",
+          },
+          Goto: &Goto{
+            Next: "#form_send_custom_msg",
+          },
+        },
+        Catch: &Catch{
+          Event: "nomatch",
+          Prompt: "Invalid input",
+          Goto: &Goto{
+            Next: "#form_custom_msg",
+          },
+        },
+      },
+      &Form{
+        Id: "form_send_custom_msg",
+        Name: "form_send_custom_msg",
+        Block: Blocks{
+          &Block{
+            BlockName: "oc_ActionUrl",
+            Goto: &Goto{
+              Next: "#End",
+            },
+          },
+          &Block{
+            BlockName: "oc_NextNodeUrl",
+            Goto: &Goto{
+              Next: "#End",
+            },
+          },
+        },
+      },
+      &Form{
+        Id: "End",
+        Name: "End",
+        Block: Blocks{
+          &Block{
+            BlockName: "oc_NextNodeUrl",
+            Goto: &Goto{
+              Next: "RESPONSE TEXT",
+            },
+          },
+        },
+      },
+    },
+  }
+  return send(vxml)
+}
+
+func send(vxml *VxmlPrompt) []byte {
   output, _ := xml.MarshalIndent(vxml, "  ", "    ")
   output = []byte(xml.Header + string(output))
   return output
