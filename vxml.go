@@ -17,11 +17,11 @@ type VxmlPrompt struct {
 type Form struct {
   Id        string    `xml:"id,attr"`
   Name      string    `xml:"name,attr"`
-  // Block     string    `xml:"block,omitempty"`
   Field     *Field    `xml:"field,omitempty"`
   Filled    *Filled   `xml:"filled,omitempty"`
   Catch     *Catch    `xml:"catch,omitempty"`
   Property  *Property `xml:"property,omitempty"`
+  Var       *Var      `xml:"var,omitempty"`
   Block     Blocks    `xml:"block,omitempty"`
 }
 
@@ -41,7 +41,7 @@ type Filled struct {
 
 type Assign struct {
   AssignName  string  `xml:"name,attr"`
-  Expr        string  `xml:"expr,attr"`
+  AssignExpr  string  `xml:"expr,attr"`
 }
 
 type Goto struct {
@@ -64,6 +64,11 @@ type Block struct {
   Goto       *Goto   `xml:"goto"`
 }
 
+type Var struct {
+  VarName  string  `xml:"var,attr"`
+  VarExpr  string  `xml:"expr,attr"`
+}
+
 type Forms  []*Form
 type Blocks []*Block
 
@@ -80,7 +85,7 @@ func sendInfoMsg(textPrompt string) []byte {
         Filled: &Filled{
           Assign: &Assign{
             AssignName: "",
-            Expr: "oc_Output",
+            AssignExpr: "oc_Output",
           },
           Goto: &Goto{
             Next: "",
@@ -116,7 +121,7 @@ func sendCustomMsg(textPrompt string) []byte {
         Filled: &Filled{
           Assign: &Assign{
             AssignName: "var_custom_msg",
-            Expr: "field_custom_msg",
+            AssignExpr: "field_custom_msg",
           },
           Goto: &Goto{
             Next: "#form_send_custom_msg",
@@ -137,7 +142,7 @@ func sendCustomMsg(textPrompt string) []byte {
           &Block{
             BlockName: "oc_ActionUrl",
             Goto: &Goto{
-              Next: "#End",
+              Next: "http_client://HTTP_CHIKKA_MAGIC/118/handler.php?sender=SOME_NUMBER&dialstring=SOME_DS&send_type=custom&recipient=SOME_NUMBER&message=%var_custom_msg%",
             },
           },
           &Block{
@@ -151,11 +156,15 @@ func sendCustomMsg(textPrompt string) []byte {
       &Form{
         Id: "End",
         Name: "End",
+        Var: &Var{
+          VarName: "strfinal",
+          VarExpr: "#!%ResponseText%",
+        },
         Block: Blocks{
           &Block{
             BlockName: "oc_NextNodeUrl",
             Goto: &Goto{
-              Next: "RESPONSE TEXT",
+              Next: "var://strfinal",
             },
           },
         },
