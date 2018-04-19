@@ -6,13 +6,21 @@ import (
 
   "encoding/pem"
   "encoding/asn1"
+  "encoding/base64"
 
   "crypto/rand"
   "crypto/rsa"
   "crypto/x509"
+  "crypto/sha256"
 
   "os"
   "io/ioutil"
+)
+
+const (
+  NILBLOCK    = "decoded pemblock is nil"
+  INVALID_PEM = "invalid pem file"
+
 )
 
 func loadKeys() ([]byte, error) {
@@ -93,4 +101,63 @@ func savePublicPem(filename string, pubkey rsa.PublicKey) error {
   }
 
   return nil
+}
+
+func encrypt(pubkeyString []byte, raw string) (string, error) {
+  nilStr   := ""
+  block, _ := pem.Decode(pubkeyString)
+  if block == nil {
+    fmt.Printf("ERROR in encrypt data: block is nil\n")
+    return nilStr, errors.New(NILBLOCK)
+  }
+
+  if got, want := block.Type, "PUBLIC KEY"; got != want {
+    fmt.Printf("ERROR in encrypt data: invalid pem file\n")
+    return nilStr, errors.New(INVALID_PEM)
+  }
+
+  pubkey, err := x509.ParsePKCS1PublicKey(block.Bytes)
+  if err != nil {
+    fmt.Printf("ERROR parsing pubkey PEM block to RSA Public Key format\n")
+    return nilStr, err
+  }
+
+  cipher, err := rsa.EncryptOAEP(sha256.New(), rand.Reader, pubkey,
+      []byte(raw), nil)
+  if err != nil {
+    fmt.Printf("ERROR in data encryption\n")
+    return nilStr, err
+  }
+
+  cipherString := base64.StdEncoding.EncodeToString(cipher)
+  return cipherString, nil
+}
+
+func decrypt(privkeyString []byte, cipherString string) (string, error) {
+  nilStr := ""
+  block, _ := pem.Decode(privkeyString)
+  if block == nil {
+    fmt.Printf("ERROR in decrypt data: block is nil\n")
+    return nilStr, errors.New(NILBLOCK)
+  }
+
+  if got, want := block.Type, "PRIVATE KEY"; got != want {
+    fmt.Printf("ERROR in decrypt data: invalid pem file\n")
+    return nilStr, errors.New(INVALID_PEM)
+  }
+
+  privkey, err := x509.ParsePKCS1PrivateKey(block.Bytes)
+  if err != nil {
+    fmt.Printf("ERROR parsing privkey PEM block to RSA Private Key format\n")
+    return nilStr, err
+  }
+
+  cipher, _ := base64.StdEncoding.DecodeString(cipherString)
+  rawString, err := rsa.DecryptOAEP(sha256.New(), rand.Reader, privkey, cipher, nil)
+  if err != nil {
+    fmt.Printf("ERROR in data decryption")
+    return nilStr, err
+  }
+
+  return string(rawString), nil
 }
