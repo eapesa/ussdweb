@@ -39,9 +39,3 @@ func main() {
   defer db.PkInsertQuery.Close()
   defer db.DbObj.Close()
 }
-
-/*
-  NOTES:
-  Use goroutine to start the server and create a channel for checking if there's
-  a signal for exit then safely shutdown the server
- */

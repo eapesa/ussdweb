@@ -48,9 +48,3 @@ func insertPubkey(stmt *sql.Stmt, user_id, pubkey string) {
   fmt.Printf("Insert/Update pubkey... OK\n")
   return
 }
-
-/*
-  NOTES:
-  - initializer return the object and have the main check if there's no db object, do stuff
-  - create maybe a struct for db objects and its prepared queries
- */
