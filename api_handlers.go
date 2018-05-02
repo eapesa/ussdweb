@@ -22,7 +22,13 @@ func ussdCodeHandler(res http.ResponseWriter, req *http.Request) {
   process_payload(sender, ds)
   res.Header().Set("Content-Type", "application/xml")
   // res.Write(sendCustomMsg(multiplyString("+123456789", 15)));
-  res.Write(sendInfoMsg(TESTMESSAGE))
+  // res.Write(sendInfoMsg(TESTMESSAGE))
+  res.Write(sendCustomMsg(CustomMessage{
+      Sender: "639473371382",
+      Dialstring: "07",
+      Recipient: "639473371382",
+      TextPrompt: "Test Custom Message",
+    }))
 }
 
 func pubkeyHandler(res http.ResponseWriter, req *http.Request) {

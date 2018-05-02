@@ -10,6 +10,13 @@ const (
   TESTMESSAGE = "DS07 Triggered. This reply is an Info Message."
 )
 
+type CustomMessage struct {
+  Sender     string
+  Recipient  string
+  Dialstring string
+  TextPrompt string
+}
+
 type VxmlPrompt struct {
   XMLName   xml.Name    `xml:"vxml"`
   Form      Forms       `xml:"form"`
@@ -109,7 +116,10 @@ func sendInfoMsg(textPrompt string) []byte {
   return send(vxml)
 }
 
-func sendCustomMsg(textPrompt string) []byte {
+func sendCustomMsg(params CustomMessage) []byte {
+  gotoNext := "http_client://HTTP_CHIKKA_MAGIC/118/handler.php?sender=" +
+      params.Sender + "&dialstring=" + params.Dialstring +
+      "&send_type=custom&recipient=" + params.Recipient + "&message=%var_custom_msg%"
   vxml := &VxmlPrompt{
     Form: Forms{
       &Form{
@@ -117,7 +127,7 @@ func sendCustomMsg(textPrompt string) []byte {
         Name: "form_custom_msg",
         Field: &Field{
           FieldName: "field_custom_msg",
-          Prompt: textPrompt,
+          Prompt: params.TextPrompt,
         },
         Filled: &Filled{
           Assign: &Assign{
@@ -143,7 +153,7 @@ func sendCustomMsg(textPrompt string) []byte {
           &Block{
             BlockName: "oc_ActionUrl",
             Goto: &Goto{
-              Next: "http_client://HTTP_CHIKKA_MAGIC/118/handler.php?sender=SOME_NUMBER&dialstring=SOME_DS&send_type=custom&recipient=SOME_NUMBER&message=%var_custom_msg%",
+              Next: gotoNext,
             },
           },
           &Block{
