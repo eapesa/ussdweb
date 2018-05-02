@@ -7,6 +7,7 @@ import (
 const (
   HELLOWORLD = "Hello World!"
   GETBALANCE = "Your current balance is "
+  TESTMESSAGE = "DS07 Triggered. This reply is an Info Message."
 )
 
 type VxmlPrompt struct {
@@ -65,7 +66,7 @@ type Block struct {
 }
 
 type Var struct {
-  VarName  string  `xml:"var,attr"`
+  VarName  string  `xml:"name,attr"`
   VarExpr  string  `xml:"expr,attr"`
 }
 

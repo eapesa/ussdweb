@@ -21,7 +21,8 @@ func ussdCodeHandler(res http.ResponseWriter, req *http.Request) {
 
   process_payload(sender, ds)
   res.Header().Set("Content-Type", "application/xml")
-  res.Write(sendCustomMsg(multiplyString("+123456789", 15)));
+  // res.Write(sendCustomMsg(multiplyString("+123456789", 15)));
+  res.Write(sendInfoMsg(TESTMESSAGE))
 }
 
 func pubkeyHandler(res http.ResponseWriter, req *http.Request) {
