@@ -21,13 +21,15 @@ func main() {
     fmt.Printf("ERROR in initializeDb: %v\n", err)
     return
   }
+  defer db.PkInsertQuery.Close()
+  defer db.DbObj.Close()
 
-  keyByte, err := loadKeys()
-  if err != nil {
-    fmt.Printf("Error in loadKeys: %v\n", err)
-    return
-  }
-  serverPubkey = string(keyByte)
+  // keyByte, err := loadKeys()
+  // if err != nil {
+  //   fmt.Printf("Error in loadKeys: %v\n", err)
+  //   return
+  // }
+  // serverPubkey = string(keyByte)
 
   // Place this in environment variables
   port := ":8000"
@@ -35,7 +37,4 @@ func main() {
   http.HandleFunc("/api/pubkey", pubkeyHandler)
   http.HandleFunc("/", ussdCodeHandler)
   http.ListenAndServe(port, nil)
-
-  defer db.PkInsertQuery.Close()
-  defer db.DbObj.Close()
 }

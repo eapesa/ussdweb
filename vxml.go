@@ -8,6 +8,12 @@ const (
   HELLOWORLD = "Hello World!"
   GETBALANCE = "Your current balance is "
   TESTMESSAGE = "DS07 Triggered. This reply is an Info Message."
+  INVALID_MESSAGE = "Invalid message"
+  CHOICE_I = "You clicked for Choice I"
+  CHOICE_II_A = "You clicked for Choice II > A"
+  CHOICE_II_B_i = "You clicked for Choice II > B > i"
+  CHOICE_II_B_ii = "You clicked for Choice II > B > ii"
+  CHOICE_III_A = "You clicked for Choice III > A"
 )
 
 type CustomMessage struct {
