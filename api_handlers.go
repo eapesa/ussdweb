@@ -5,8 +5,6 @@ import (
   "net/url"
 
   "encoding/json"
-
-  "strings"
   "fmt"
 )
 
@@ -61,18 +59,18 @@ func pubkeyHandler(res http.ResponseWriter, req *http.Request) {
 func process_payload(sender, ds string) string {
   if sender == "" {
     fmt.Printf("ERROR: Invalid inputs (`sender`)\n")
-    return "INVALID_MESSAGE"
+    return INVALID_DIALSTRING
   }
 
   if ds == "" {
     fmt.Printf("ERROR: Invalid inputs (`dialstring`)\n")
-    return "INVALID_MESSAGE"
+    return INVALID_DIALSTRING
   }
 
   dsdecoded, err := url.QueryUnescape(ds)
   if err != nil {
     fmt.Printf("ERROR: Dialstring can't be decoded\n")
-    return "INVALID_MESSAGE"
+    return INVALID_DIALSTRING
   }
 
   dsdecoded = dsdecoded[:len(dsdecoded) - 1]
@@ -81,16 +79,6 @@ func process_payload(sender, ds string) string {
   dstranslated := &DSPayload{ Dialstring: dsdecoded }
   dstranslated.Parse()
   return dstranslated.GenerateResponse()
-}
-
-func parse(dialstring string) []string {
-  dsdecoded, err := url.QueryUnescape(dialstring)
-  if err != nil {
-    fmt.Printf("ERROR: Encountered error decoding query string\n")
-    return make([]string, 0)
-  }
-
-  return strings.Split(dsdecoded, "*#")
 }
 
 // For easier testing of maximum character count.

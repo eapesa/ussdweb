@@ -19,10 +19,10 @@ func LoadMenu() {
       "Menu-II": {
         "Menu-I": "Menu II > B > i",
         "Menu-II": "Menu II > B > ii"
-      },
-      "Menu-III": {
-        "Menu-III": "Menu III > A"
       }
+    },
+    "Menu-III": {
+      "Menu-III": "Menu III > A"
     }
   }`)
   m := make(Menu)
@@ -30,6 +30,7 @@ func LoadMenu() {
   if err != nil {
     fmt.Printf("Error loading menu\n")
   }
+  fmt.Printf("Menu loaded successfully: %v\n", m)
   dsMenu = m
 }
 
@@ -43,6 +44,15 @@ func Translate(key string) string {
 }
 
 func FindMenuValue(data Menu, keys []string) string {
+  if len(keys) == 0 {
+    subkeys := "menu:"
+    for k := range data {
+      subkeys = subkeys + k + "|"
+    }
+    subkeys = subkeys[:len(subkeys) - 1]
+    return subkeys
+  }
+
   key := Translate(keys[0])
   value, ok := data[key].(string)
   if ok && len(keys) == 1 {
