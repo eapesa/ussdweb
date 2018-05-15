@@ -15,14 +15,13 @@ func LoadMenu() {
   menu := []byte(`{
     "Menu-I": "Menu I",
     "Menu-II": {
-      "Menu-I": "Menu II > A",
-      "Menu-II": {
-        "Menu-I": "Menu II > B > i",
-        "Menu-II": "Menu II > B > ii"
-      }
+      "Menu-I": "Menu II > A"
     },
     "Menu-III": {
-      "Menu-I": "Menu III > A"
+      "Menu-I": {
+        "Menu-I": "Menu III > B > i",
+        "Menu-II": "Menu III > B > ii"
+      }
     }
   }`)
   m := make(Menu)
