@@ -22,7 +22,7 @@ func LoadMenu() {
       }
     },
     "Menu-III": {
-      "Menu-III": "Menu III > A"
+      "Menu-I": "Menu III > A"
     }
   }`)
   m := make(Menu)
@@ -44,15 +44,6 @@ func Translate(key string) string {
 }
 
 func FindMenuValue(data Menu, keys []string) string {
-  if len(keys) == 0 {
-    subkeys := "menu:"
-    for k := range data {
-      subkeys = subkeys + k + "|"
-    }
-    subkeys = subkeys[:len(subkeys) - 1]
-    return subkeys
-  }
-
   key := Translate(keys[0])
   value, ok := data[key].(string)
   if ok && len(keys) == 1 {
@@ -60,16 +51,16 @@ func FindMenuValue(data Menu, keys []string) string {
     return "text:You traversed " + value
   }
 
-  if !ok && len(keys) > 1 {
-    return FindMenuValue(data[key].(map[string]interface{}), keys[1:])
-  }
-
   if !ok && len(keys) == 1 {
     subkeys := "menu:"
-    for k := range data {
+    for k := range data[key].(map[string]interface{}) {
       subkeys = subkeys + k + "|"
     }
     return subkeys[:len(subkeys) - 1]
+  }
+
+  if !ok && len(keys) > 1 {
+    return FindMenuValue(data[key].(map[string]interface{}), keys[1:])
   }
 
   return INVALID_DIALSTRING
@@ -93,6 +84,15 @@ func (ds *DSPayload) GenerateResponse() string {
   if ds.Mode != "1" {
     return UNKNOWN_MODE
   } else {
-    return FindMenuValue(dsMenu, ds.Rest)
+    if len(ds.Rest) == 0 {
+      subkeys := "menu:"
+      for k := range dsMenu {
+        subkeys = subkeys + k + "|"
+      }
+      subkeys = subkeys[:len(subkeys) - 1]
+      return subkeys
+    } else {
+      return FindMenuValue(dsMenu, ds.Rest)
+    }
   }
 }
