@@ -10,6 +10,7 @@ const (
   TESTMESSAGE = "DS07 Triggered. This reply is an Info Message."
   INVALID_MESSAGE = "You have entered an invalid message."
   INVALID_DIALSTRING = "Invalid dialstring. No mapping found."
+  UNKNOWN_MODE = "Unknown mode."
   CHOICE_I = "You clicked for Choice I"
   CHOICE_II_A = "You clicked for Choice II > A"
   CHOICE_II_B_i = "You clicked for Choice II > B > i"

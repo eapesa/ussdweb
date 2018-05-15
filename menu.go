@@ -81,7 +81,7 @@ func (ds *DSPayload) Parse() {
 
 func (ds *DSPayload) GenerateResponse() string {
   if ds.Mode != "1" {
-    return ""
+    return UNKNOWN_MODE
   } else {
     return FindMenuValue(dsMenu, ds.Rest)
   }
