@@ -24,6 +24,8 @@ func main() {
   defer db.PkInsertQuery.Close()
   defer db.DbObj.Close()
 
+  LoadMenu()
+
   // keyByte, err := loadKeys()
   // if err != nil {
   //   fmt.Printf("Error in loadKeys: %v\n", err)
