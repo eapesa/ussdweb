@@ -7,6 +7,7 @@ import(
   "encoding/json"
 )
 
+var rawMenu []byte
 var dsMenu Menu
 
 type Menu map[string]interface{}
@@ -19,11 +20,11 @@ func LoadMenu() {
     },
     "Menu-III": {
       "Menu-I": {
-        "Menu-I": "Menu III > B > i",
-        "Menu-II": "Menu III > B > ii"
+        "Menu-I": "Menu III > B > i"
       }
     }
   }`)
+  rawMenu = menu
   m := make(Menu)
   err := json.Unmarshal(menu, &m)
   if err != nil {
@@ -80,9 +81,10 @@ func (ds *DSPayload) Parse() {
 }
 
 func (ds *DSPayload) GenerateResponse() string {
-  if ds.Mode != "1" {
-    return UNKNOWN_MODE
-  } else {
+  if ds.Mode == "0" {
+    result := "menu:" + GenerateMenu(dsMenu)
+    return result
+  } else if ds.Mode == "1" {
     if len(ds.Rest) == 0 {
       subkeys := "menu:"
       for k := range dsMenu {
@@ -93,5 +95,21 @@ func (ds *DSPayload) GenerateResponse() string {
     } else {
       return FindMenuValue(dsMenu, ds.Rest)
     }
+  } else {
+    return UNKNOWN_MODE
   }
+}
+
+func GenerateMenu(data Menu) string {
+  menu := ""
+  for key := range data {
+    fmt.Printf("KEY IS %v || MENU IS %v\n", key, data)
+    value, ok := data[key].(map[string]interface{})
+    if ok {
+      menu = menu + key + ">" + GenerateMenu(value)
+    } else {
+      menu = menu + key + "|"
+    }
+  }
+  return menu
 }
