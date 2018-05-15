@@ -64,7 +64,7 @@ func process_payload(sender, ds string) string {
     return "INVALID_MESSAGE"
   }
 
-  if ds  == "" {
+  if ds == "" {
     fmt.Printf("ERROR: Invalid inputs (`dialstring`)\n")
     return "INVALID_MESSAGE"
   }
@@ -75,21 +75,12 @@ func process_payload(sender, ds string) string {
     return "INVALID_MESSAGE"
   }
 
+  dsdecoded = dsdecoded[:len(dsdecoded) - 1]
   fmt.Printf("TODO: Process dialstring %s\n", dsdecoded)
-  switch dsdecoded {
-  case "07*1#":
-    return CHOICE_I
-  case "07*2*1#":
-    return CHOICE_II_A
-  case "07*2*2*1#":
-    return CHOICE_II_B_i
-  case "07*2*2*2#":
-    return CHOICE_II_B_ii
-  case "07*3*1#":
-    return CHOICE_III_A
-  }
 
-  return INVALID_MESSAGE
+  dstranslated := &DSPayload{ Dialstring: dsdecoded }
+  dstranslated.Parse()
+  return dstranslated.GenerateResponse()
 }
 
 func parse(dialstring string) []string {
