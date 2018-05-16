@@ -82,7 +82,8 @@ func (ds *DSPayload) Parse() {
 
 func (ds *DSPayload) GenerateResponse() string {
   if ds.Mode == "0" {
-    result := "menu:" + GenerateMenu(dsMenu)
+    menu := GenerateMenu(dsMenu)
+    result := "menu:" + menu[:len(menu) - 1]
     return result
   } else if ds.Mode == "1" {
     if len(ds.Rest) == 0 {
